@@ -15,17 +15,24 @@ function geradorDeId(lista) {
 module.exports = {
 	Usuario: {
 		perfil(usuario) {
-			return db.perfis.find((p) => p.id === usuario.perfil);
+			return db.perfis.find((p) => p.id === usuario.perfil_id);
 		},
 	},
 	Query: {
 		usuario(_, args) {
-			return db.usuarios.find(db => db.id === args.id)
+			return db.usuarios.find((db) => db.id === args.id)
 		},
 		usuarios: () => db.usuarios,
 	},
 	Mutation: {
 		criarUsuario(_, args){
+			const { email } = args;
+
+			const usuarioExistente = db.usuarios.some((u) => u.email === email);
+
+			if (usuarioExistente){
+				throw new Error(`Usuário Existente: ${args.nome}`);
+			}
 			const novoUsuario = {
 				...args,
 				id: geradorDeId(db.usuarios),
